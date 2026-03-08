@@ -1,0 +1,21 @@
+{
+  "profileId": "cj4_default",
+  "aircraft": "CJ4",
+  "name": "Working Title CJ4 AP",
+  "mappings": [
+    {
+      "deviceId": "rowsfire-a320-ap",
+      "controlId": "BTN_AP1",
+      "onIncreaseEvent": "CJ4_AP_MASTER",
+      "onDecreaseEvent": null,
+      "step": 1
+    },
+    {
+      "deviceId": "rowsfire-a320-ap",
+      "controlId": "ENC_HDG",
+      "onIncreaseEvent": "CJ4_HDG_INC",
+      "onDecreaseEvent": "CJ4_HDG_DEC",
+      "step": 1
+    }
+  ]
+}
