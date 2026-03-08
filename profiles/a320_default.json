@@ -1,9 +1,5 @@
 {
- codex/outline-product-requirements-for-rowslink-gleech
   "profileId": "a320_default",
-
-  "profileId": "default",
- main
   "aircraft": "A320",
   "name": "Default A320 AP",
   "mappings": [

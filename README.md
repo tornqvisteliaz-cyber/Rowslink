@@ -1,4 +1,3 @@
- codex/outline-product-requirements-for-rowslink-gleech
 # RowsLink MVP App (EXE-ready)
 
 Detta repo innehåller en körbar **RowsLink-app** i C#/.NET med stöd för profiler, mapping och simulator-connector-arkitektur.
@@ -15,9 +14,28 @@ Detta repo innehåller en körbar **RowsLink-app** i C#/.NET med stöd för prof
 - Dashboard i konsol (MVP-UI)
 - Runtime som bootar enheter + simulatorstatus + aktiv profil
 
-## Bygg Windows EXE
+## Viktig fix för `MSB1009: Project file does not exist`
 
-Kör på en maskin med .NET 8 SDK installerat:
+Felet uppstår när man kör `dotnet publish src/RowsLink.App/RowsLink.App.csproj ...` från fel working directory (t.ex. `C:\Windows\System32`).
+
+Använd i stället scriptet i `scripts/` som hittar repo-root automatiskt.
+
+### Alternativ 1 (PowerShell)
+
+```powershell
+# fungerar även om du står i C:\Windows\System32
+C:\path\to\Rowslink\scripts\publish-win-x64.ps1
+```
+
+### Alternativ 2 (CMD)
+
+```bat
+C:\path\to\Rowslink\scripts\publish-win-x64.cmd
+```
+
+## Manuell build av Windows EXE
+
+Kör från **repo root**:
 
 ```bash
 dotnet publish src/RowsLink.App/RowsLink.App.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true
@@ -25,7 +43,7 @@ dotnet publish src/RowsLink.App/RowsLink.App.csproj -c Release -r win-x64 --self
 
 Output-exe blir:
 
-`src/RowsLink.App/bin/Release/net8.0-windows/win-x64/publish/RowsLink.exe`
+`src/RowsLink.App/bin/Release/net9.0-windows/win-x64/publish/RowsLink.exe`
 
 ## Kör appen
 
@@ -56,38 +74,3 @@ Exempel:
 2. Koppla in riktig SimConnect-/X-Plane-/FSUIPC7-I/O.
 3. Lägg till desktop UI (WPF/WinUI/Avalonia).
 4. Lägg till plugin-loader och auto-aircraft-detection från simulator.
-
-# RowsLink MVP (kodskelett)
-
-Detta repo innehåller en första körbar MVP-arkitektur för **RowsLink** baserat på kraven i `PRD_RowsLink.md`.
-
-## Vad som finns implementerat
-
-- **Hardware detection-lager** via `IHardwareDiscovery` + mockad HID-device scan.
-- **Simulator connectors** för:
-  - MSFS SimConnect
-  - X-Plane DataRefs
-  - FSUIPC7
-- **Mapping engine** som mappar device-input till simulator events.
-- **Aircraft profiles** i JSON med auto-seeding av A320-profil.
-- **Dashboard (console-UI)** som visar:
-  - anslutna paneler
-  - simulatorstatus
-  - aktiv profil
-- **Input-routing loop** för att simulera knapp/encoder-input.
-
-## Projektstruktur
-
-- `src/RowsLink.App/Core` – domänmodeller, interfaces, tjänster
-- `src/RowsLink.App/Infrastructure` – mockad hårdvara, simulatorkopplingar, JSON profil-store
-- `src/RowsLink.App/UI` – enkel dashboard i konsol
-- `src/RowsLink.App/Program.cs` – composition root och runtime
-
-## Nästa steg mot riktig produktion
-
-1. Byt `MockHidDeviceDiscovery` mot riktig HIDSharp-implementation.
-2. Implementera verklig SimConnect-/X-Plane-/FSUIPC7-I/O.
-3. Ersätt console-UI med desktop-UI (WPF/WinUI/Avalonia).
-4. Lägg till latency-mätning och 10 ms polling-loop.
-5. Lägg till export/import samt auto-load per aircraft från simulator-state.
- main
