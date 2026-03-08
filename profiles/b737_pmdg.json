@@ -1,0 +1,21 @@
+{
+  "profileId": "b737_pmdg",
+  "aircraft": "B737",
+  "name": "PMDG 737 MCP",
+  "mappings": [
+    {
+      "deviceId": "rowsfire-a320-ap",
+      "controlId": "BTN_AP1",
+      "onIncreaseEvent": "PMDG_CMD_A",
+      "onDecreaseEvent": null,
+      "step": 1
+    },
+    {
+      "deviceId": "rowsfire-a320-ap",
+      "controlId": "ENC_HDG",
+      "onIncreaseEvent": "PMDG_HDG_INC",
+      "onDecreaseEvent": "PMDG_HDG_DEC",
+      "step": 1
+    }
+  ]
+}

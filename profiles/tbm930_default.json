@@ -1,0 +1,21 @@
+{
+  "profileId": "tbm930_default",
+  "aircraft": "TBM930",
+  "name": "Default TBM930 AP",
+  "mappings": [
+    {
+      "deviceId": "rowsfire-a320-ap",
+      "controlId": "BTN_AP1",
+      "onIncreaseEvent": "TBM_AP_MASTER",
+      "onDecreaseEvent": null,
+      "step": 1
+    },
+    {
+      "deviceId": "rowsfire-a320-ap",
+      "controlId": "ENC_HDG",
+      "onIncreaseEvent": "TBM_HDG_INC",
+      "onDecreaseEvent": "TBM_HDG_DEC",
+      "step": 1
+    }
+  ]
+}

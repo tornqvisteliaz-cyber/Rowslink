@@ -1,0 +1,21 @@
+{
+  "profileId": "a320_fenix",
+  "aircraft": "A320",
+  "name": "Fenix A320 AP",
+  "mappings": [
+    {
+      "deviceId": "rowsfire-a320-ap",
+      "controlId": "BTN_AP1",
+      "onIncreaseEvent": "FENIX_AP1_PUSH",
+      "onDecreaseEvent": null,
+      "step": 1
+    },
+    {
+      "deviceId": "rowsfire-a320-ap",
+      "controlId": "ENC_HDG",
+      "onIncreaseEvent": "FENIX_HDG_INC",
+      "onDecreaseEvent": "FENIX_HDG_DEC",
+      "step": 1
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "profileId": "dc6_pmdg",
+  "aircraft": "DC6",
+  "name": "PMDG DC-6 AP",
+  "mappings": [
+    {
+      "deviceId": "rowsfire-a320-ap",
+      "controlId": "BTN_AP1",
+      "onIncreaseEvent": "PMDG_DC6_AP_MASTER",
+      "onDecreaseEvent": null,
+      "step": 1
+    },
+    {
+      "deviceId": "rowsfire-a320-ap",
+      "controlId": "ENC_HDG",
+      "onIncreaseEvent": "PMDG_DC6_HDG_INC",
+      "onDecreaseEvent": "PMDG_DC6_HDG_DEC",
+      "step": 1
+    }
+  ]
+}
