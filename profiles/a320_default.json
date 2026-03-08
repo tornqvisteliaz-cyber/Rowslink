@@ -1,0 +1,21 @@
+{
+  "profileId": "default",
+  "aircraft": "A320",
+  "name": "Default A320 AP",
+  "mappings": [
+    {
+      "deviceId": "rowsfire-a320-ap",
+      "controlId": "BTN_AP1",
+      "onIncreaseEvent": "AUTOPILOT_MASTER",
+      "onDecreaseEvent": null,
+      "step": 1
+    },
+    {
+      "deviceId": "rowsfire-a320-ap",
+      "controlId": "ENC_HDG",
+      "onIncreaseEvent": "HEADING_BUG_INC",
+      "onDecreaseEvent": "HEADING_BUG_DEC",
+      "step": 1
+    }
+  ]
+}
