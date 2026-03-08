@@ -9,121 +9,104 @@ using RowsLink.App.Infrastructure.Simulator;
 using RowsLink.App.Infrastructure.System;
 using RowsLink.App.UI;
 
-var aircraft = args.FirstOrDefault() ?? "A320";
+namespace RowsLink.App;
 
-var fsuipcHost = Environment.GetEnvironmentVariable("ROWSLINK_FSUIPC7_HOST") ?? "127.0.0.1";
-var fsuipcPort = int.TryParse(Environment.GetEnvironmentVariable("ROWSLINK_FSUIPC7_PORT"), out var parsedPort)
-    ? parsedPort
-    : 8383;
-
-var services = new ServiceCollection();
-
-services.AddLogging(builder =>
+internal static class Program
 {
-    builder.AddSimpleConsole(options =>
+    [STAThread]
+    private static async Task Main(string[] args)
     {
-        options.SingleLine = true;
-        options.TimestampFormat = "HH:mm:ss ";
-    });
-    builder.SetMinimumLevel(LogLevel.Information);
-});
+        var aircraft = args.FirstOrDefault() ?? "A320";
 
-services.AddSingleton<IHardwareDiscovery, MockHidDeviceDiscovery>();
-services.AddSingleton<IMotherboardInfoProvider, MotherboardInfoProvider>();
-services.AddSingleton<ISimulatorConnector, SimConnectConnector>();
-services.AddSingleton<ISimulatorConnector, XPlaneConnector>();
-services.AddSingleton<ISimulatorConnector>(_ =>
-{
-    var logger = _.GetRequiredService<ILogger<Fsuipc7Connector>>();
-    return new Fsuipc7Connector(logger, fsuipcHost, fsuipcPort);
-});
-services.AddSingleton<IProfileStore>(_ =>
-{
-    var profileDir = ResolveProfileDirectory();
-    return new JsonProfileStore(profileDir);
-});
-services.AddSingleton<MappingEngine>();
-services.AddSingleton<RowsLinkRuntime>();
+        var fsuipcHost = Environment.GetEnvironmentVariable("ROWSLINK_FSUIPC7_HOST") ?? "127.0.0.1";
+        var fsuipcPort = int.TryParse(Environment.GetEnvironmentVariable("ROWSLINK_FSUIPC7_PORT"), out var parsedPort)
+            ? parsedPort
+            : 8383;
 
-var provider = services.BuildServiceProvider();
-var profileStore = provider.GetRequiredService<IProfileStore>();
-await SeedFallbackProfileIfEmptyAsync(profileStore);
+        var services = new ServiceCollection();
 
-var profiles = await profileStore.GetProfilesAsync();
-Console.WriteLine($"RowsLink loaded {profiles.Count} profiles.");
-Console.WriteLine($"FSUIPC7 endpoint: {fsuipcHost}:{fsuipcPort}");
-
-var runtime = provider.GetRequiredService<RowsLinkRuntime>();
-var snapshot = await runtime.BootAsync(aircraft);
-ConsoleDashboard.Render(snapshot);
-
-while (true)
-{
-    DeviceInput input;
-    try
-    {
-        input = ConsoleDashboard.PromptInput();
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Invalid input: {ex.Message}");
-        continue;
-    }
-
-    if (string.IsNullOrWhiteSpace(input.DeviceId))
-    {
-        break;
-    }
-
-    try
-    {
-        await runtime.RouteInputAsync(input, snapshot.ActiveProfile, SimulatorKind.Fsuipc7);
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Failed to route input: {ex.Message}");
-    }
-}
-
-static string ResolveProfileDirectory()
-{
-    var candidates = new[]
-    {
-        Path.Combine(AppContext.BaseDirectory, "profiles"),
-        Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "profiles")),
-        Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "profiles"))
-    };
-
-    foreach (var candidate in candidates)
-    {
-        if (Directory.Exists(candidate))
+        services.AddLogging(builder =>
         {
-            return candidate;
-        }
+            builder.AddSimpleConsole(options =>
+            {
+                options.SingleLine = true;
+                options.TimestampFormat = "HH:mm:ss ";
+            });
+            builder.SetMinimumLevel(LogLevel.Information);
+        });
+
+        services.AddSingleton<IHardwareDiscovery, MockHidDeviceDiscovery>();
+        services.AddSingleton<IMotherboardInfoProvider, MotherboardInfoProvider>();
+        services.AddSingleton<ISimulatorConnector, SimConnectConnector>();
+        services.AddSingleton<ISimulatorConnector, XPlaneConnector>();
+        services.AddSingleton<ISimulatorConnector>(sp =>
+        {
+            var logger = sp.GetRequiredService<ILogger<Fsuipc7Connector>>();
+            return new Fsuipc7Connector(logger, fsuipcHost, fsuipcPort);
+        });
+
+        services.AddSingleton<IProfileStore>(_ =>
+        {
+            var profileDir = ResolveProfileDirectory();
+            return new JsonProfileStore(profileDir);
+        });
+
+        services.AddSingleton<MappingEngine>();
+        services.AddSingleton<RowsLinkRuntime>();
+        services.AddSingleton<MainForm>(_ => new MainForm(
+            _.GetRequiredService<RowsLinkRuntime>(),
+            aircraft,
+            fsuipcHost,
+            fsuipcPort));
+
+        var provider = services.BuildServiceProvider();
+        var profileStore = provider.GetRequiredService<IProfileStore>();
+        await SeedFallbackProfileIfEmptyAsync(profileStore);
+
+        ApplicationConfiguration.Initialize();
+        Application.Run(provider.GetRequiredService<MainForm>());
     }
 
-    var defaultDir = Path.Combine(AppContext.BaseDirectory, "profiles");
-    Directory.CreateDirectory(defaultDir);
-    return defaultDir;
-}
-
-static async Task SeedFallbackProfileIfEmptyAsync(IProfileStore profileStore)
-{
-    var profiles = await profileStore.GetProfilesAsync();
-    if (profiles.Count > 0)
+    private static string ResolveProfileDirectory()
     {
-        return;
+        var candidates = new[]
+        {
+            Path.Combine(AppContext.BaseDirectory, "profiles"),
+            Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "profiles")),
+            Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "profiles"))
+        };
+
+        foreach (var candidate in candidates)
+        {
+            if (Directory.Exists(candidate))
+            {
+                return candidate;
+            }
+        }
+
+        var defaultDir = Path.Combine(AppContext.BaseDirectory, "profiles");
+        Directory.CreateDirectory(defaultDir);
+        return defaultDir;
     }
 
-    var defaultA320 = new AircraftProfile(
-        ProfileId: "fallback",
-        Aircraft: "A320",
-        Name: "Fallback A320 AP",
-        Mappings:
-        [
-            new MappingEntry("rowsfire-a320-ap", "BTN_AP1", "AUTOPILOT_MASTER"),
-            new MappingEntry("rowsfire-a320-ap", "ENC_HDG", "HEADING_BUG_INC", "HEADING_BUG_DEC")
-        ]);
+    private static async Task SeedFallbackProfileIfEmptyAsync(IProfileStore profileStore)
+    {
+        var profiles = await profileStore.GetProfilesAsync();
+        if (profiles.Count > 0)
+        {
+            return;
+        }
 
-    await profileStore.SaveAsync(defaultA320);
+        var defaultA320 = new AircraftProfile(
+            ProfileId: "fallback",
+            Aircraft: "A320",
+            Name: "Fallback A320 AP",
+            Mappings:
+            [
+                new MappingEntry("rowsfire-a320-ap", "BTN_AP1", "AUTOPILOT_MASTER"),
+                new MappingEntry("rowsfire-a320-ap", "ENC_HDG", "HEADING_BUG_INC", "HEADING_BUG_DEC")
+            ]);
+
+        await profileStore.SaveAsync(defaultA320);
+    }
 }

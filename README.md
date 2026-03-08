@@ -1,59 +1,53 @@
-# RowsLink MVP App (EXE-ready)
+# RowsLink Windows App (WinForms, EXE-ready)
 
-Detta repo innehåller en körbar **RowsLink-app** i C#/.NET med stöd för profiler, mapping och simulator-connector-arkitektur.
+Detta repo innehåller en riktig **Windows app** (WinForms) i C#/.NET för RowsLink.
 
-## Implementerat
+## Appfunktioner
 
-- USB panel discovery-lager (mock idag, redo att ersättas med HIDSharp)
-- **Moderkortsanslutning**: läser baseboard-info (Manufacturer/Product/Serial) via WMI på Windows
+- Windows GUI (inte console-loop)
+- Moderkortsanslutning: läser baseboard-info (Manufacturer/Product/Serial) via WMI på Windows
+- Cockpit panel discovery-lager (mock idag, redo att ersättas med HIDSharp)
 - Simulator connectors för:
   - MSFS SimConnect
   - X-Plane DataRefs
-  - **FSUIPC7 (TCP endpoint)**
-- Mapping engine för knapp/encoder-input
-- Profilsystem med många färdiga aircraft-profiler (`profiles/*.json`)
-- Dashboard i konsol (MVP-UI)
-- Runtime som bootar moderkort + enheter + simulatorstatus + aktiv profil
+  - FSUIPC7 via TCP endpoint
+- Aircraft-profiler i JSON (`profiles/*.json`)
+- Input-panel i UI där du skickar knapp/encoder-input till FSUIPC7
 
-## Viktig fix för `MSB1009: Project file does not exist`
+## Bygg Windows EXE
 
-Felet uppstår när man kör `dotnet publish src/RowsLink.App/RowsLink.App.csproj ...` från fel working directory (t.ex. `C:\Windows\System32`).
-
-Använd i stället scriptet i `scripts/` som hittar repo-root automatiskt.
-
-### Alternativ 1 (PowerShell)
+Använd scripts som funkar även om du står i `C:\Windows\System32`:
 
 ```powershell
-# fungerar även om du står i C:\Windows\System32
 C:\path\to\Rowslink\scripts\publish-win-x64.ps1
 ```
 
-### Alternativ 2 (CMD)
+eller:
 
 ```bat
 C:\path\to\Rowslink\scripts\publish-win-x64.cmd
 ```
 
-## Manuell build av Windows EXE
-
-Kör från **repo root**:
-
-```bash
-dotnet publish src/RowsLink.App/RowsLink.App.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true
-```
-
-Output-exe blir:
+Output:
 
 `src/RowsLink.App/bin/Release/net9.0-windows/win-x64/publish/RowsLink.exe`
 
+## Kör appen
+
+```bat
+RowsLink.exe A320
+```
+
+(utan argument används `A320`)
+
 ## FSUIPC7-anslutning
 
-Appen ansluter till FSUIPC7 via TCP endpoint. Ange endpoint med miljövariabler:
+Sätt endpoint med miljövariabler:
 
 - `ROWSLINK_FSUIPC7_HOST` (default `127.0.0.1`)
 - `ROWSLINK_FSUIPC7_PORT` (default `8383`)
 
-Exempel i PowerShell:
+Exempel:
 
 ```powershell
 $env:ROWSLINK_FSUIPC7_HOST="127.0.0.1"
@@ -61,19 +55,8 @@ $env:ROWSLINK_FSUIPC7_PORT="8383"
 RowsLink.exe A320
 ```
 
-## Kör appen
+## Profilbibliotek
 
-```bash
-RowsLink.exe A320
-```
-
-(utan argument används `A320`)
-
-## Profiler
-
-Appen laddar profiler från `profiles/` och väljer aktiv profil via aircraft-namn.
-
-Exempel:
 - A320 (default, iFly, Fenix)
 - A320neo (FBW A32NX)
 - B737 (default, PMDG)
@@ -83,10 +66,3 @@ Exempel:
 - A300
 - TBM930
 - DC-6
-
-## Nästa steg
-
-1. Byt mockad HID mot riktig HIDSharp discovery + polling.
-2. Bygg riktig offset-/event-protokolladapter mot FSUIPC7 SDK.
-3. Lägg till desktop UI (WPF/WinUI/Avalonia).
-4. Lägg till plugin-loader och auto-aircraft-detection från simulator.
