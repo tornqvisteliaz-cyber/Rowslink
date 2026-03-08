@@ -1,0 +1,21 @@
+{
+  "profileId": "b747_default",
+  "aircraft": "B747",
+  "name": "Default 747 AP",
+  "mappings": [
+    {
+      "deviceId": "rowsfire-a320-ap",
+      "controlId": "BTN_AP1",
+      "onIncreaseEvent": "B747_AP_ENGAGE",
+      "onDecreaseEvent": null,
+      "step": 1
+    },
+    {
+      "deviceId": "rowsfire-a320-ap",
+      "controlId": "ENC_HDG",
+      "onIncreaseEvent": "B747_HDG_INC",
+      "onDecreaseEvent": "B747_HDG_DEC",
+      "step": 1
+    }
+  ]
+}
