@@ -1,0 +1,21 @@
+{
+  "profileId": "a32nx_fbwa320neo",
+  "aircraft": "A320neo",
+  "name": "FBW A32NX AP",
+  "mappings": [
+    {
+      "deviceId": "rowsfire-a320-ap",
+      "controlId": "BTN_AP1",
+      "onIncreaseEvent": "A32NX_AP1_PUSH",
+      "onDecreaseEvent": null,
+      "step": 1
+    },
+    {
+      "deviceId": "rowsfire-a320-ap",
+      "controlId": "ENC_HDG",
+      "onIncreaseEvent": "A32NX_HDG_INC",
+      "onDecreaseEvent": "A32NX_HDG_DEC",
+      "step": 1
+    }
+  ]
+}

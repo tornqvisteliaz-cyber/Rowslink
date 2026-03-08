@@ -1,0 +1,21 @@
+{
+  "profileId": "a300_inibuilds",
+  "aircraft": "A300",
+  "name": "iniBuilds A300 AP",
+  "mappings": [
+    {
+      "deviceId": "rowsfire-a320-ap",
+      "controlId": "BTN_AP1",
+      "onIncreaseEvent": "A300_AP1",
+      "onDecreaseEvent": null,
+      "step": 1
+    },
+    {
+      "deviceId": "rowsfire-a320-ap",
+      "controlId": "ENC_HDG",
+      "onIncreaseEvent": "A300_HDG_INC",
+      "onDecreaseEvent": "A300_HDG_DEC",
+      "step": 1
+    }
+  ]
+}

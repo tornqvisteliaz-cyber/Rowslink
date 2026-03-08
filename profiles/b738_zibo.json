@@ -1,0 +1,21 @@
+{
+  "profileId": "b738_zibo",
+  "aircraft": "B738",
+  "name": "Zibo 737 MCP",
+  "mappings": [
+    {
+      "deviceId": "rowsfire-a320-ap",
+      "controlId": "BTN_AP1",
+      "onIncreaseEvent": "ZIBO_CMD_A",
+      "onDecreaseEvent": null,
+      "step": 1
+    },
+    {
+      "deviceId": "rowsfire-a320-ap",
+      "controlId": "ENC_HDG",
+      "onIncreaseEvent": "ZIBO_HDG_INC",
+      "onDecreaseEvent": "ZIBO_HDG_DEC",
+      "step": 1
+    }
+  ]
+}
