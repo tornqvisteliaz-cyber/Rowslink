@@ -8,6 +8,8 @@ using RowsLink.App.Infrastructure.Profiles;
 using RowsLink.App.Infrastructure.Simulator;
 using RowsLink.App.UI;
 
+var aircraft = args.FirstOrDefault() ?? "A320";
+
 var services = new ServiceCollection();
 
 services.AddLogging(builder =>
@@ -26,7 +28,7 @@ services.AddSingleton<ISimulatorConnector, XPlaneConnector>();
 services.AddSingleton<ISimulatorConnector, Fsuipc7Connector>();
 services.AddSingleton<IProfileStore>(_ =>
 {
-    var profileDir = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "profiles"));
+    var profileDir = ResolveProfileDirectory();
     return new JsonProfileStore(profileDir);
 });
 services.AddSingleton<MappingEngine>();
@@ -34,11 +36,13 @@ services.AddSingleton<RowsLinkRuntime>();
 
 var provider = services.BuildServiceProvider();
 var profileStore = provider.GetRequiredService<IProfileStore>();
+await SeedFallbackProfileIfEmptyAsync(profileStore);
 
-await SeedDefaultProfilesAsync(profileStore);
+var profiles = await profileStore.GetProfilesAsync();
+Console.WriteLine($"RowsLink loaded {profiles.Count} profiles.");
 
 var runtime = provider.GetRequiredService<RowsLinkRuntime>();
-var snapshot = await runtime.BootAsync("A320");
+var snapshot = await runtime.BootAsync(aircraft);
 ConsoleDashboard.Render(snapshot);
 
 while (true)
@@ -69,7 +73,29 @@ while (true)
     }
 }
 
-static async Task SeedDefaultProfilesAsync(IProfileStore profileStore)
+static string ResolveProfileDirectory()
+{
+    var candidates = new[]
+    {
+        Path.Combine(AppContext.BaseDirectory, "profiles"),
+        Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "profiles")),
+        Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "profiles"))
+    };
+
+    foreach (var candidate in candidates)
+    {
+        if (Directory.Exists(candidate))
+        {
+            return candidate;
+        }
+    }
+
+    var defaultDir = Path.Combine(AppContext.BaseDirectory, "profiles");
+    Directory.CreateDirectory(defaultDir);
+    return defaultDir;
+}
+
+static async Task SeedFallbackProfileIfEmptyAsync(IProfileStore profileStore)
 {
     var profiles = await profileStore.GetProfilesAsync();
     if (profiles.Count > 0)
@@ -78,9 +104,9 @@ static async Task SeedDefaultProfilesAsync(IProfileStore profileStore)
     }
 
     var defaultA320 = new AircraftProfile(
-        ProfileId: "default",
+        ProfileId: "fallback",
         Aircraft: "A320",
-        Name: "Default A320 AP",
+        Name: "Fallback A320 AP",
         Mappings:
         [
             new MappingEntry("rowsfire-a320-ap", "BTN_AP1", "AUTOPILOT_MASTER"),

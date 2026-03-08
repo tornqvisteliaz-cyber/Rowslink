@@ -1,16 +1,12 @@
 {
- codex/outline-product-requirements-for-rowslink-gleech
-  "profileId": "a320_default",
-
-  "profileId": "default",
- main
-  "aircraft": "A320",
-  "name": "Default A320 AP",
+  "profileId": "b737_default",
+  "aircraft": "B737",
+  "name": "Default 737 MCP",
   "mappings": [
     {
       "deviceId": "rowsfire-a320-ap",
       "controlId": "BTN_AP1",
-      "onIncreaseEvent": "AUTOPILOT_MASTER",
+      "onIncreaseEvent": "B737_CMD_A",
       "onDecreaseEvent": null,
       "step": 1
     },
