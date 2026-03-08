@@ -4,7 +4,7 @@ Detta repo innehåller en riktig **Windows app** (WinForms) i C#/.NET för RowsL
 
 ## Appfunktioner
 
-- Windows GUI (inte console-loop)
+- Modern Windows GUI med tabs (Dashboard / Devices / Mapping Editor)
 - Moderkortsanslutning: läser baseboard-info (Manufacturer/Product/Serial) via WMI på Windows
 - Cockpit panel discovery-lager (mock idag, redo att ersättas med HIDSharp)
 - Simulator connectors för:
@@ -12,7 +12,20 @@ Detta repo innehåller en riktig **Windows app** (WinForms) i C#/.NET för RowsL
   - X-Plane DataRefs
   - FSUIPC7 via TCP endpoint
 - Aircraft-profiler i JSON (`profiles/*.json`)
-- Input-panel i UI där du skickar knapp/encoder-input till FSUIPC7
+- Mapping Editor med tabell + Auto-Map + Save Profile
+- Snabb test-input i UI för att skicka events till FSUIPC7
+
+## MobiFlight-liknande workflow
+
+UI:t är nu byggt för ett liknande arbetssätt:
+
+1. Se upptäckta enheter och simulatorstatus i **Devices**.
+2. Redigera mappings rad-för-rad i **Mapping Editor**.
+3. Klicka **Auto-Map** för snabb basmappning (AP1/Heading).
+4. Klicka **Save Profile** för att skriva profiler till JSON.
+5. Skicka test-input direkt mot FSUIPC7 med top-toolbar.
+
+> Obs: appen efterliknar workflow, men är inte en 1:1-kopia av MobiFlight internt.
 
 ## Bygg Windows EXE
 
@@ -54,15 +67,3 @@ $env:ROWSLINK_FSUIPC7_HOST="127.0.0.1"
 $env:ROWSLINK_FSUIPC7_PORT="8383"
 RowsLink.exe A320
 ```
-
-## Profilbibliotek
-
-- A320 (default, iFly, Fenix)
-- A320neo (FBW A32NX)
-- B737 (default, PMDG)
-- B738 (Zibo)
-- B747
-- CJ4
-- A300
-- TBM930
-- DC-6

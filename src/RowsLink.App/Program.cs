@@ -53,8 +53,9 @@ internal static class Program
 
         services.AddSingleton<MappingEngine>();
         services.AddSingleton<RowsLinkRuntime>();
-        services.AddSingleton<MainForm>(_ => new MainForm(
-            _.GetRequiredService<RowsLinkRuntime>(),
+        services.AddSingleton<MainForm>(sp => new MainForm(
+            sp.GetRequiredService<RowsLinkRuntime>(),
+            sp.GetRequiredService<IProfileStore>(),
             aircraft,
             fsuipcHost,
             fsuipcPort));
