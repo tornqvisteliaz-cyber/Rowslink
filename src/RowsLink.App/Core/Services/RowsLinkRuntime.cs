@@ -6,6 +6,7 @@ namespace RowsLink.App.Core.Services;
 
 public sealed class RowsLinkRuntime(
     IHardwareDiscovery hardwareDiscovery,
+    IMotherboardInfoProvider motherboardInfoProvider,
     IEnumerable<ISimulatorConnector> simulatorConnectors,
     IProfileStore profileStore,
     MappingEngine mappingEngine,
@@ -15,6 +16,7 @@ public sealed class RowsLinkRuntime(
     {
         var startedAt = DateTimeOffset.UtcNow;
 
+        var motherboard = await motherboardInfoProvider.GetAsync(cancellationToken);
         var devices = await hardwareDiscovery.ScanAsync(cancellationToken);
         var connectors = simulatorConnectors.ToList();
 
@@ -30,7 +32,7 @@ public sealed class RowsLinkRuntime(
         var bootDuration = DateTimeOffset.UtcNow - startedAt;
         logger.LogInformation("RowsLink started with {DeviceCount} devices in {DurationMs} ms", devices.Count, bootDuration.TotalMilliseconds);
 
-        return new RuntimeSnapshot(devices, statusList, profile, bootDuration);
+        return new RuntimeSnapshot(motherboard, devices, statusList, profile, bootDuration);
     }
 
     public async Task RouteInputAsync(
@@ -50,6 +52,7 @@ public sealed class RowsLinkRuntime(
 }
 
 public sealed record RuntimeSnapshot(
+    MotherboardInfo Motherboard,
     IReadOnlyList<HardwareDevice> Devices,
     IReadOnlyList<SimulatorStatus> SimulatorStatuses,
     AircraftProfile ActiveProfile,

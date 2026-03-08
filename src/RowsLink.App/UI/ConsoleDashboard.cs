@@ -11,6 +11,14 @@ public static class ConsoleDashboard
         Console.WriteLine($"Startup: {snapshot.StartupDuration.TotalMilliseconds:N0} ms");
         Console.WriteLine();
 
+        Console.WriteLine("Motherboard:");
+        Console.WriteLine($"- Manufacturer: {snapshot.Motherboard.Manufacturer}");
+        Console.WriteLine($"- Product: {snapshot.Motherboard.Product}");
+        Console.WriteLine($"- Serial: {snapshot.Motherboard.SerialNumber}");
+        Console.WriteLine($"- Source: {snapshot.Motherboard.Source}");
+        Console.WriteLine($"- Connected: {snapshot.Motherboard.IsConnected}");
+        Console.WriteLine();
+
         Console.WriteLine("Connected Panels:");
         foreach (var device in snapshot.Devices)
         {

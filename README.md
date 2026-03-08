@@ -5,14 +5,15 @@ Detta repo innehåller en körbar **RowsLink-app** i C#/.NET med stöd för prof
 ## Implementerat
 
 - USB panel discovery-lager (mock idag, redo att ersättas med HIDSharp)
+- **Moderkortsanslutning**: läser baseboard-info (Manufacturer/Product/Serial) via WMI på Windows
 - Simulator connectors för:
   - MSFS SimConnect
   - X-Plane DataRefs
-  - FSUIPC7
+  - **FSUIPC7 (TCP endpoint)**
 - Mapping engine för knapp/encoder-input
 - Profilsystem med många färdiga aircraft-profiler (`profiles/*.json`)
 - Dashboard i konsol (MVP-UI)
-- Runtime som bootar enheter + simulatorstatus + aktiv profil
+- Runtime som bootar moderkort + enheter + simulatorstatus + aktiv profil
 
 ## Viktig fix för `MSB1009: Project file does not exist`
 
@@ -45,6 +46,21 @@ Output-exe blir:
 
 `src/RowsLink.App/bin/Release/net9.0-windows/win-x64/publish/RowsLink.exe`
 
+## FSUIPC7-anslutning
+
+Appen ansluter till FSUIPC7 via TCP endpoint. Ange endpoint med miljövariabler:
+
+- `ROWSLINK_FSUIPC7_HOST` (default `127.0.0.1`)
+- `ROWSLINK_FSUIPC7_PORT` (default `8383`)
+
+Exempel i PowerShell:
+
+```powershell
+$env:ROWSLINK_FSUIPC7_HOST="127.0.0.1"
+$env:ROWSLINK_FSUIPC7_PORT="8383"
+RowsLink.exe A320
+```
+
 ## Kör appen
 
 ```bash
@@ -70,7 +86,7 @@ Exempel:
 
 ## Nästa steg
 
-1. Implementera riktig HIDSharp-device detection.
-2. Koppla in riktig SimConnect-/X-Plane-/FSUIPC7-I/O.
+1. Byt mockad HID mot riktig HIDSharp discovery + polling.
+2. Bygg riktig offset-/event-protokolladapter mot FSUIPC7 SDK.
 3. Lägg till desktop UI (WPF/WinUI/Avalonia).
 4. Lägg till plugin-loader och auto-aircraft-detection från simulator.

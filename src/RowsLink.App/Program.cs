@@ -6,9 +6,15 @@ using RowsLink.App.Core.Services;
 using RowsLink.App.Infrastructure.Hardware;
 using RowsLink.App.Infrastructure.Profiles;
 using RowsLink.App.Infrastructure.Simulator;
+using RowsLink.App.Infrastructure.System;
 using RowsLink.App.UI;
 
 var aircraft = args.FirstOrDefault() ?? "A320";
+
+var fsuipcHost = Environment.GetEnvironmentVariable("ROWSLINK_FSUIPC7_HOST") ?? "127.0.0.1";
+var fsuipcPort = int.TryParse(Environment.GetEnvironmentVariable("ROWSLINK_FSUIPC7_PORT"), out var parsedPort)
+    ? parsedPort
+    : 8383;
 
 var services = new ServiceCollection();
 
@@ -23,9 +29,14 @@ services.AddLogging(builder =>
 });
 
 services.AddSingleton<IHardwareDiscovery, MockHidDeviceDiscovery>();
+services.AddSingleton<IMotherboardInfoProvider, MotherboardInfoProvider>();
 services.AddSingleton<ISimulatorConnector, SimConnectConnector>();
 services.AddSingleton<ISimulatorConnector, XPlaneConnector>();
-services.AddSingleton<ISimulatorConnector, Fsuipc7Connector>();
+services.AddSingleton<ISimulatorConnector>(_ =>
+{
+    var logger = _.GetRequiredService<ILogger<Fsuipc7Connector>>();
+    return new Fsuipc7Connector(logger, fsuipcHost, fsuipcPort);
+});
 services.AddSingleton<IProfileStore>(_ =>
 {
     var profileDir = ResolveProfileDirectory();
@@ -40,6 +51,7 @@ await SeedFallbackProfileIfEmptyAsync(profileStore);
 
 var profiles = await profileStore.GetProfilesAsync();
 Console.WriteLine($"RowsLink loaded {profiles.Count} profiles.");
+Console.WriteLine($"FSUIPC7 endpoint: {fsuipcHost}:{fsuipcPort}");
 
 var runtime = provider.GetRequiredService<RowsLinkRuntime>();
 var snapshot = await runtime.BootAsync(aircraft);
@@ -65,7 +77,7 @@ while (true)
 
     try
     {
-        await runtime.RouteInputAsync(input, snapshot.ActiveProfile, SimulatorKind.MsfsSimConnect);
+        await runtime.RouteInputAsync(input, snapshot.ActiveProfile, SimulatorKind.Fsuipc7);
     }
     catch (Exception ex)
     {
