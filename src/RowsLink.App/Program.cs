@@ -4,6 +4,7 @@ using RowsLink.App.Core.Abstractions;
 using RowsLink.App.Core.Models;
 using RowsLink.App.Core.Services;
 using RowsLink.App.Infrastructure.Hardware;
+using RowsLink.App.Infrastructure.Boards;
 using RowsLink.App.Infrastructure.Profiles;
 using RowsLink.App.Infrastructure.Simulator;
 using RowsLink.App.Infrastructure.System;
@@ -36,6 +37,7 @@ internal static class Program
         });
 
         services.AddSingleton<IHardwareDiscovery, MockHidDeviceDiscovery>();
+        services.AddSingleton<IBoardManager, SerialBoardManager>();
         services.AddSingleton<IMotherboardInfoProvider, MotherboardInfoProvider>();
         services.AddSingleton<ISimulatorConnector, SimConnectConnector>();
         services.AddSingleton<ISimulatorConnector, XPlaneConnector>();
@@ -56,6 +58,7 @@ internal static class Program
         services.AddSingleton<MainForm>(sp => new MainForm(
             sp.GetRequiredService<RowsLinkRuntime>(),
             sp.GetRequiredService<IProfileStore>(),
+            sp.GetRequiredService<IBoardManager>(),
             aircraft,
             fsuipcHost,
             fsuipcPort));

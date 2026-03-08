@@ -4,41 +4,42 @@ Detta repo innehåller en riktig **Windows app** (WinForms) i C#/.NET för RowsL
 
 ## Appfunktioner
 
-- Modern Windows GUI med tabs (Dashboard / Devices / Mapping Editor)
-- Moderkortsanslutning: läser baseboard-info (Manufacturer/Product/Serial) via WMI på Windows
-- Cockpit panel discovery-lager (mock idag, redo att ersättas med HIDSharp)
-- Simulator connectors för:
-  - MSFS SimConnect
-  - X-Plane DataRefs
-  - FSUIPC7 via TCP endpoint
+- Modern Windows GUI med tabs:
+  - Dashboard
+  - Devices
+  - Mapping Editor
+  - Boards & Firmware
+- Moderkortsanslutning via WMI (Manufacturer/Product/Serial)
+- Board-detektering via serial ports (COM)
+- Firmware-uppladdning via `arduino-cli upload`
+- Simulator connectors: MSFS SimConnect, X-Plane DataRefs, FSUIPC7 TCP
 - Aircraft-profiler i JSON (`profiles/*.json`)
 - Mapping Editor med tabell + Auto-Map + Save Profile
-- Snabb test-input i UI för att skicka events till FSUIPC7
 
-## MobiFlight-liknande workflow
+## Boards & Firmware
 
-UI:t är nu byggt för ett liknande arbetssätt:
+Fliken **Boards & Firmware** gör att du kan:
 
-1. Se upptäckta enheter och simulatorstatus i **Devices**.
-2. Redigera mappings rad-för-rad i **Mapping Editor**.
-3. Klicka **Auto-Map** för snabb basmappning (AP1/Heading).
-4. Klicka **Save Profile** för att skriva profiler till JSON.
-5. Skicka test-input direkt mot FSUIPC7 med top-toolbar.
+1. Klicka **Scan Boards** för att hitta anslutna COM-boards.
+2. Välja board/port från listan (fyller i Port + Suggested Type).
+3. Välja firmware-fil (`.hex`/`.bin`) via **Browse**.
+4. Klicka **Upload Firmware** för att köra:
 
-> Obs: appen efterliknar workflow, men är inte en 1:1-kopia av MobiFlight internt.
+```bash
+arduino-cli upload -p <COMx> --fqbn <board_type> --input-file <firmware_file>
+```
+
+Exempel på board type:
+- `arduino:avr:mega`
+- `arduino:avr:nano`
+- `arduino:avr:uno`
+
+> Detta matchar tipset i din screenshot: välj korrekt board type om auto-detection inte räcker.
 
 ## Bygg Windows EXE
 
-Använd scripts som funkar även om du står i `C:\Windows\System32`:
-
 ```powershell
 C:\path\to\Rowslink\scripts\publish-win-x64.ps1
-```
-
-eller:
-
-```bat
-C:\path\to\Rowslink\scripts\publish-win-x64.cmd
 ```
 
 Output:
@@ -51,19 +52,7 @@ Output:
 RowsLink.exe A320
 ```
 
-(utan argument används `A320`)
-
-## FSUIPC7-anslutning
-
-Sätt endpoint med miljövariabler:
+## FSUIPC7 endpoint
 
 - `ROWSLINK_FSUIPC7_HOST` (default `127.0.0.1`)
 - `ROWSLINK_FSUIPC7_PORT` (default `8383`)
-
-Exempel:
-
-```powershell
-$env:ROWSLINK_FSUIPC7_HOST="127.0.0.1"
-$env:ROWSLINK_FSUIPC7_PORT="8383"
-RowsLink.exe A320
-```
