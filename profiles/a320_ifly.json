@@ -1,0 +1,21 @@
+{
+  "profileId": "a320_ifly",
+  "aircraft": "A320",
+  "name": "iFly A320 AP",
+  "mappings": [
+    {
+      "deviceId": "rowsfire-a320-ap",
+      "controlId": "BTN_AP1",
+      "onIncreaseEvent": "IFLY_AP1_TOGGLE",
+      "onDecreaseEvent": null,
+      "step": 1
+    },
+    {
+      "deviceId": "rowsfire-a320-ap",
+      "controlId": "ENC_HDG",
+      "onIncreaseEvent": "IFLY_HDG_INC",
+      "onDecreaseEvent": "IFLY_HDG_DEC",
+      "step": 1
+    }
+  ]
+}
